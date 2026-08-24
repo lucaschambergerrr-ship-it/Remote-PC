@@ -5,6 +5,7 @@ mss
 numpy
 pyautogui
 pynput
-eventlet
+gevent
+gevent-websocket
 gunicorn
 wakeonlan
