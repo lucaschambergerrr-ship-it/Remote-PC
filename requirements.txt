@@ -1,9 +1,4 @@
 Flask
 Flask-SocketIO
-opencv-python-headless
-mss
-numpy
-pyautogui
-pynput
 gunicorn
 wakeonlan
