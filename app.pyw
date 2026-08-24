@@ -15,7 +15,7 @@ pyautogui.PAUSE = 0
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'remote_pc_secret_key'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 mouse = MouseController()
 keyboard = KeyboardController()
