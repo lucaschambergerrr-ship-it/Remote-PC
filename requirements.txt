@@ -7,4 +7,4 @@ pyautogui
 pynput
 eventlet
 gunicorn
-wakeonlans
+wakeonlan
