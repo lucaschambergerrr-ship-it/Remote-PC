@@ -1,401 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remote PC Access</title>
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
-            background-color: #090a0f;
-            color: #ffffff;
-            overflow: hidden;
-        }
-
-        #auth-screen {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: #090a0f;
-        }
-
-        .login-card {
-            background: #121621;
-            border: 1px solid #1e2638;
-            border-radius: 24px;
-            padding: 40px 28px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .login-card h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .login-card p {
-            color: #64748b;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin-bottom: 28px;
-        }
-
-        .input-box input {
-            width: 100%;
-            background: #090a0f;
-            border: 2px solid #1e2638;
-            border-radius: 14px;
-            padding: 16px;
-            color: #ffffff;
-            font-size: 1.2rem;
-            text-align: center;
-            outline: none;
-            margin-bottom: 20px;
-        }
-
-        .btn-connect {
-            width: 100%;
-            background: #2563eb;
-            color: #ffffff;
-            border: none;
-            border-radius: 14px;
-            padding: 16px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .error-msg {
-            margin-top: 18px;
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            line-height: 1.4;
-        }
-
-        #control-screen {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            flex-direction: column;
-            background: #000;
-        }
-
-        .screen-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            touch-action: none;
-        }
-
-        #stream-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .panel-controls {
-            background: #121621;
-            border-top: 1px solid #1e2638;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 45vh;
-            overflow-y: auto;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-action {
-            flex: 1;
-            background: #1e2638;
-            color: #fff;
-            border: none;
-            padding: 12px 6px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            touch-action: manipulation;
-        }
-
-        .btn-primary { background: #2563eb; }
-        .btn-fullscreen { background: #059669; }
-
-        .key-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-        }
-
-        .btn-key {
-            background: #090a0f;
-            color: #94a3b8;
-            border: 1px solid #1e2638;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            touch-action: manipulation;
-        }
-
-        body.fullscreen .panel-controls { display: none !important; }
-        body.fullscreen .screen-area { height: 100vh !important; }
-        .hidden { display: none !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Control Remoto PC</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
+    .btn { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; }
+    .btn:active { background: #0056b3; }
+    #stream-container { display: none; width: 100%; height: 100vh; flex-direction: column; justify-content: center; align-items: center; background: #000; }
+    #screen { width: 100%; max-height: 80vh; object-fit: contain; }
+    .status-dot { height: 12px; width: 12px; background-color: #ff4d4d; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.online { background-color: #2ea44f; }
+  </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="login-card">
-            <div class="status-badge">● ONLINE</div>
-            <h1>Remote PC</h1>
-            <p>Ingresa el código que se muestra en la terminal.</p>
-            
-            <form id="login-form">
-                <div class="input-box">
-                    <input type="text" id="code-input" placeholder="CÓDIGO" autocomplete="off" autocapitalize="characters" required>
-                </div>
-                <button type="submit" class="btn-connect">CONECTAR</button>
-            </form>
-            <div id="error-box" class="error-msg hidden"></div>
-        </div>
-    </div>
+  <!-- Vista 1: PC Apagada -->
+  <div id="offline-ui" class="card">
+    <h2><span id="dot" class="status-dot"></span><span id="status-text">PC Apagada</span></h2>
+    <p style="color: #aaa; margin-top: 10px;">Presiona el botón para enviar la señal de encendido (Wake-on-LAN).</p>
+    <button class="btn" onclick="wakePC()">Encender PC</button>
+  </div>
 
-    <div id="control-screen">
-        <div class="screen-area" id="touch-area">
-            <img id="stream-img" alt="">
-        </div>
+  <!-- Vista 2: Streaming Activo -->
+  <div id="stream-container">
+    <img id="screen" src="" alt="Stream de PC">
+  </div>
 
-        <div class="panel-controls" id="controls-panel">
-            <div class="btn-row">
-                <button class="btn-action btn-primary" id="click-left">IZQUIERDO</button>
-                <button class="btn-action btn-primary" id="click-right">DERECHO</button>
-                <button class="btn-action btn-primary" id="click-double">DOBLE</button>
-                <button class="btn-action btn-fullscreen" id="btn-fs">PANTALLA FULL</button>
-            </div>
+  <script>
+    const socket = io();
+    const offlineUi = document.getElementById('offline-ui');
+    const streamContainer = document.getElementById('stream-container');
+    const screenImg = document.getElementById('screen');
+    const dot = document.getElementById('dot');
+    const statusText = document.getElementById('status-text');
 
-            <div class="btn-row">
-                <button class="btn-action" id="scroll-up">▲ SCROLL</button>
-                <button class="btn-action" id="scroll-down">▼ SCROLL</button>
-            </div>
+    // Escuchar el cambio de estado enviado por Render
+    socket.on('status_change', (data) => {
+      if (data.online) {
+        offlineUi.style.display = 'none';
+        streamContainer.style.display = 'flex';
+      } else {
+        offlineUi.style.display = 'block';
+        streamContainer.style.display = 'none';
+        dot.classList.remove('online');
+        statusText.innerText = 'PC Apagada';
+      }
+    });
 
-            <div class="key-row">
-                <button class="btn-key" data-key="Enter">Enter</button>
-                <button class="btn-key" data-key="Space">Espacio</button>
-                <button class="btn-key" data-key="Backspace">Borrar</button>
-                <button class="btn-key" data-key="Escape">Esc</button>
-                <button class="btn-key" data-key="Tab">Tab</button>
-                <button class="btn-key" data-key="ArrowUp">↑</button>
-                <button class="btn-key" data-key="ArrowDown">↓</button>
-                <button class="btn-key" data-key="ArrowLeft">←</button>
-                <button class="btn-key" data-key="ArrowRight">→</button>
-            </div>
-        </div>
-    </div>
+    // Recibir frames de imagen desde la PC
+    socket.on('screen_frame', (data) => {
+      offlineUi.style.display = 'none';
+      streamContainer.style.display = 'flex';
+      screenImg.src = 'data:image/jpeg;base64,' + data.image;
+    });
 
-    <script>
-        let socket = null;
+    function wakePC() {
+      fetch('/api/wake', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(err => alert('Error enviando paquete WAKE'));
+    }
 
-        const authScreen = document.getElementById('auth-screen');
-        const controlScreen = document.getElementById('control-screen');
-        const loginForm = document.getElementById('login-form');
-        const codeInput = document.getElementById('code-input');
-        const errorBox = document.getElementById('error-box');
-        const streamImg = document.getElementById('stream-img');
-        const touchArea = document.getElementById('touch-area');
-        const btnFs = document.getElementById('btn-fs');
+    // Controles táctiles del celular enviados a la PC
+    let lastX = 0, lastY = 0;
+    screenImg.addEventListener('touchstart', (e) => {
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+    });
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorBox.classList.add('hidden');
-            const code = codeInput.value.trim();
+    screenImg.addEventListener('touchmove', (e) => {
+      let dx = e.touches[0].clientX - lastX;
+      let dy = e.touches[0].clientY - lastY;
+      lastX = e.touches[0].clientX;
+      lastY = e.touches[0].clientY;
+      socket.emit('input_event', { type: 'mouse_move', dx: dx, dy: dy });
+    });
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500);
-
-            try {
-                // 1. Probar estado del servidor
-                const statusRes = await fetch('/api/status', { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (!statusRes.ok) throw new Error("Offline");
-
-                // 2. Probar credenciales de inicio de sesión
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code })
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    authScreen.style.display = 'none';
-                    controlScreen.style.display = 'flex';
-                    initSocket();
-                } else {
-                    errorBox.textContent = 'Código incorrecto';
-                    errorBox.classList.remove('hidden');
-                }
-            } catch (err) {
-                // Si la PC está apagada o no responde en 2.5 segundos
-                errorBox.innerHTML = '<strong>COMPUTADORA APAGADA</strong><br><small>Enciende la PC para poder conectar.</small>';
-                errorBox.classList.remove('hidden');
-            }
-        });
-
-        function initSocket() {
-            socket = io();
-
-            socket.on('screen_frame', (data) => {
-                streamImg.src = 'data:image/jpeg;base64,' + data.image;
-            });
-
-            let lastX = 0;
-            let lastY = 0;
-            let touching = false;
-
-            touchArea.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    touching = true;
-                    lastX = e.touches[0].clientX;
-                    lastY = e.touches[0].clientY;
-                }
-            }, { passive: true });
-
-            touchArea.addEventListener('touchmove', (e) => {
-                if (!touching || e.touches.length !== 1) return;
-
-                const curX = e.touches[0].clientX;
-                const curY = e.touches[0].clientY;
-
-                const dx = curX - lastX;
-                const dy = curY - lastY;
-
-                lastX = curX;
-                lastY = curY;
-
-                if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
-                    socket.emit('mouse_move', { dx, dy });
-                }
-            }, { passive: true });
-
-            touchArea.addEventListener('touchend', () => touching = false);
-
-            function bindClick(id, action) {
-                const btn = document.getElementById(id);
-                const handler = (e) => {
-                    e.preventDefault();
-                    if (socket) socket.emit('mouse_click', { action });
-                };
-                btn.addEventListener('touchstart', handler);
-                btn.addEventListener('click', handler);
-            }
-
-            bindClick('click-left', 'left');
-            bindClick('click-right', 'right');
-            bindClick('click-double', 'double');
-
-            function bindScroll(id, direction) {
-                const btn = document.getElementById(id);
-                const handler = (e) => {
-                    e.preventDefault();
-                    if (socket) socket.emit('mouse_scroll', { direction });
-                };
-                btn.addEventListener('touchstart', handler);
-                btn.addEventListener('click', handler);
-            }
-
-            bindScroll('scroll-up', 'up');
-            bindScroll('scroll-down', 'down');
-
-            document.querySelectorAll('.btn-key').forEach(btn => {
-                const handler = (e) => {
-                    e.preventDefault();
-                    const key = btn.getAttribute('data-key');
-                    if (socket) socket.emit('key_press', { key });
-                };
-                btn.addEventListener('touchstart', handler);
-                btn.addEventListener('click', handler);
-            });
-
-            btnFs.addEventListener('click', toggleFullscreen);
-            btnFs.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                toggleFullscreen();
-            });
-
-            touchArea.addEventListener('dblclick', () => {
-                if (document.body.classList.contains('fullscreen')) {
-                    toggleFullscreen();
-                }
-            });
-        }
-
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().then(() => {
-                    document.body.classList.add('fullscreen');
-                }).catch(() => {});
-            } else {
-                document.exitFullscreen().then(() => {
-                    document.body.classList.remove('fullscreen');
-                }).catch(() => {});
-            }
-        }
-    </script>
+    screenImg.addEventListener('click', () => {
+      socket.emit('input_event', { type: 'mouse_click', action: 'left' });
+    });
+  </script>
 </body>
 </html>
-// Si la computadora está apagada, muestra el botón para enviar la orden
-errorBox.innerHTML = `
-    <strong>COMPUTADORA APAGADA</strong><br>
-    <button id="btn-wake" style="margin-top:10px; padding:8px 12px; background:#10b981; color:#fff; border:none; border-radius:8px; font-weight:bold;">
-        ENCENDER COMPUTADORA
-    </button>
-`;
-errorBox.classList.remove('hidden');
-
-document.getElementById('btn-wake')?.addEventListener('click', async () => {
-    await fetch('/api/wake', { method: 'POST' });
-    alert('Se envió la señal de encendido a la PC');
-});
