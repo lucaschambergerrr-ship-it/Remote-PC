@@ -7,12 +7,12 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; }
     .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
     .btn { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; }
     .btn:active { background: #0056b3; }
-    #stream-container { display: none; width: 100%; height: 100vh; flex-direction: column; justify-content: center; align-items: center; background: #000; }
-    #screen { width: 100%; max-height: 80vh; object-fit: contain; }
+    #stream-container { display: none; width: 100vw; height: 100vh; background: #000; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
+    #screen { width: 100%; height: 100%; object-fit: contain; }
     .status-dot { height: 12px; width: 12px; background-color: #ff4d4d; border-radius: 50%; display: inline-block; margin-right: 6px; }
     .status-dot.online { background-color: #2ea44f; }
   </style>
@@ -22,13 +22,13 @@
   <!-- Vista 1: PC Apagada -->
   <div id="offline-ui" class="card">
     <h2><span id="dot" class="status-dot"></span><span id="status-text">PC Apagada</span></h2>
-    <p style="color: #aaa; margin-top: 10px;">Presiona el botón para enviar la señal de encendido (Wake-on-LAN).</p>
+    <p style="color: #aaa; margin-top: 10px;">Presiona el botón para encender la PC en la red local.</p>
     <button class="btn" onclick="wakePC()">Encender PC</button>
   </div>
 
   <!-- Vista 2: Streaming Activo -->
   <div id="stream-container">
-    <img id="screen" src="" alt="Stream de PC">
+    <img id="screen" src="" alt="Cargando transmisión...">
   </div>
 
   <script>
@@ -39,7 +39,7 @@
     const dot = document.getElementById('dot');
     const statusText = document.getElementById('status-text');
 
-    // Escuchar el cambio de estado enviado por Render
+    // Cambiar vista cuando la PC cambia de estado
     socket.on('status_change', (data) => {
       if (data.online) {
         offlineUi.style.display = 'none';
@@ -52,7 +52,7 @@
       }
     });
 
-    // Recibir frames de imagen desde la PC
+    // Renderizar fotogramas de video recibidos desde agent_pc.py
     socket.on('screen_frame', (data) => {
       offlineUi.style.display = 'none';
       streamContainer.style.display = 'flex';
@@ -63,10 +63,10 @@
       fetch('/api/wake', { method: 'POST' })
         .then(res => res.json())
         .then(data => alert(data.message))
-        .catch(err => alert('Error enviando paquete WAKE'));
+        .catch(err => alert('Error enviando señal de encendido'));
     }
 
-    // Controles táctiles del celular enviados a la PC
+    // Controles táctiles en el celular
     let lastX = 0, lastY = 0;
     screenImg.addEventListener('touchstart', (e) => {
       lastX = e.touches[0].clientX;
